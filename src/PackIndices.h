@@ -81,10 +81,8 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #define PACK_INDICES_H
 #include <cstdlib>
 
-namespace PsimagLite
-{
-class PackIndices
-{
+namespace PsimagLite {
+class PackIndices {
 
 public:
 
@@ -99,7 +97,7 @@ public:
 		// y  = ind/n;
 		// x = ind - y*n;
 		// x= ind % n;
-		div_t q = PsimagLite::div(ind, n_);
+		ldiv_t q = std::ldiv(ind, n_);
 		y = q.quot;
 		x = q.rem;
 	}

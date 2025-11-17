@@ -81,18 +81,18 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #include <fenv.h>
 #endif
 
-namespace PsimagLite
-{
+namespace PsimagLite {
 
-class FloatingPoint
-{
+class FloatingPoint {
 
 public:
 
 	static void enableExcept()
 	{
 #ifndef NDEBUG
+#ifndef __APPLE__
 		feenableexcept(FE_DIVBYZERO | FE_INVALID);
+#endif
 #endif
 	}
 }; // class FloatingPoint

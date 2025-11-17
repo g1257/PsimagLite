@@ -80,16 +80,14 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #ifndef PTHREADS_AND_MPI_H
 #define PTHREADS_AND_MPI_H
 
-#include "Mpi.h"
+#include "NotMpi.h"
 #include "Pthreads.h"
 #include <iostream>
 #include <pthread.h>
 
-namespace PsimagLite
-{
+namespace PsimagLite {
 template <typename PthreadFunctionHolderType>
-class PthreadsAndMpi : public Pthreads<PthreadFunctionHolderType>
-{
+class PthreadsAndMpi : public Pthreads<PthreadFunctionHolderType> {
 
 	typedef Pthreads<PthreadFunctionHolderType> BaseType;
 

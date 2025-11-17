@@ -5,12 +5,10 @@
 
 #ifndef USE_MS_GEOMETRY
 
-namespace PsimagLite
-{
+namespace PsimagLite {
 
 template <typename RealType, typename InputType>
-class GeometryEx
-{
+class GeometryEx {
 
 public:
 
@@ -27,13 +25,14 @@ public:
 	    : meshLength_(static_cast<SizeType>(sqrt(meshPoints)))
 	    , enabled_(false)
 	    , meshStep_((meshLength_ > 0)
-		      ? static_cast<RealType>(2 * M_PI / meshLength_)
-		      : 0)
+	                    ? static_cast<RealType>(2 * M_PI / meshLength_)
+	                    : 0)
 	{
 		String str;
 		try {
 			io.readline(str, "GeometryKind=", false);
-		} catch (std::exception&) {
+		}
+		catch (std::exception&) {
 			io.readline(str, "gt0:GeometryKind=", false);
 		}
 
@@ -44,9 +43,9 @@ public:
 	template <class Archive>
 	void write(Archive& ar, const unsigned int)
 	{
-		ar& meshLength_;
-		ar& enabled_;
-		ar& meshStep_;
+		ar & meshLength_;
+		ar & enabled_;
+		ar & meshStep_;
 	}
 
 	template <typename SomeMemResolvType>
@@ -108,7 +107,7 @@ public:
 		assert(enabled_);
 		int k1 = k;
 		int m = meshLength_;
-		div_t q = PsimagLite::div(k1, m);
+		div_t q = std::div(k1, m);
 		kvector[0] = -M_PI + q.quot * meshStep_;
 		kvector[1] = -M_PI + q.rem * meshStep_;
 	}
@@ -132,12 +131,10 @@ private:
 
 #include "msGeometry.h"
 
-namespace PsimagLite
-{
+namespace PsimagLite {
 
 template <typename RealType, typename InputType>
-class GeometryEx
-{
+class GeometryEx {
 
 public:
 

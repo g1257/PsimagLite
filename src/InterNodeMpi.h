@@ -1,7 +1,7 @@
 #ifndef INTER_NODE_MPI_H
 #define INTER_NODE_MPI_H
 #include "LoadBalancerMpi.h"
-#include "Mpi.h"
+#include "NotMpi.h"
 #include "TypeToString.h"
 #include "Vector.h"
 #include <algorithm>
@@ -9,12 +9,10 @@
 #include <sched.h>
 #include <unistd.h>
 
-namespace PsimagLite
-{
+namespace PsimagLite {
 
 template <typename LoadBalancerType = LoadBalancerMpi>
-class InterNode
-{
+class InterNode {
 
 public:
 

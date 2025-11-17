@@ -40,19 +40,11 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 
 ## Description
 
-PsimagLite is a collection of C++ classes that are common to
- codes for the simulation of strongly correlated electrons.
-PsimagLite is inspired in T.S.'s Psimag software (but PsimagLite is not a fork of Psimag).
+As of November 2025, PsimagLite is integrated into DMRG++.
+Please see https://github.com/g1257/dmrgpp
+for instructions on cloning DMRG++ and compiling PsimagLite.
 
-The reason for PsimagLite is to share code among different applications.
-Applications that depend on PsimagLite are:
-SpinPhononFermion, DMRG++, Lanczos++, FreeFermions, GpusDoneRight, BetheAnsatz
+## Archived
 
-## Code integrity
-
-Hash of the latest commit is also posted at
-https://g1257.github.com/hashes.html
-
-Latest commit should always be signed.
-Keys at https://g1257.github.com/keys.html
+This project is now archived and read-only.
 

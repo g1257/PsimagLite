@@ -19,12 +19,10 @@ Please see full open source license included in file LICENSE.
 #define PSI_TREE_H
 #include "../PsimagLite.h"
 
-namespace PsimagLite
-{
+namespace PsimagLite {
 
 template <typename PrimitivesType>
-class Tree
-{
+class Tree {
 
 public:
 
@@ -65,7 +63,7 @@ public:
 		ValueType tmp = node_.exec(values);
 		if (verbose_) {
 			std::cout << "tmp= " << tmp
-				  << " type= " << node_.code();
+			          << " type= " << node_.code();
 			for (SizeType i = 0; i < values.size(); i++)
 				std::cout << values[i] << " ";
 			std::cout << "\n";
@@ -93,7 +91,21 @@ public:
 		node_.set(values[index]);
 	}
 
-	void setDescendants(const TreeType& n0) { descendants_.push_back(&n0); }
+	bool isLinearTree() const
+	{
+		if (descendants_.size() > 1)
+			return false;
+
+		if (descendants_.size() == 0)
+			return true;
+
+		return descendants_[0]->isLinearTree();
+	}
+
+	void setDescendants(const TreeType& n0)
+	{
+		descendants_.push_back(&n0);
+	}
 
 	void setDescendants(const TreeType& n0, const TreeType& n1)
 	{

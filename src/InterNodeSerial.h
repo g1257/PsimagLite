@@ -1,14 +1,12 @@
 #ifndef INTER_NODE_SERIAL_H
 #define INTER_NODE_SERIAL_H
-#include "Mpi.h"
+#include "NotMpi.h"
 #include "Vector.h"
 
-namespace PsimagLite
-{
+namespace PsimagLite {
 
 template <typename = int>
-class InterNode
-{
+class InterNode {
 
 public:
 

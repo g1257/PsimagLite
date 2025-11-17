@@ -79,25 +79,24 @@ DISCLOSED WOULD NOT INFRINGE PRIVATELY OWNED RIGHTS.
 #define PSI_GEOM_LONG_RANGE_H
 #include "GeometryBase.h"
 
-namespace PsimagLite
-{
+namespace PsimagLite {
 
 template <typename ComplexOrRealType, typename InputType>
-class LongRange : public GeometryBase<ComplexOrRealType, InputType>
-{
+class LongRange : public GeometryBase<ComplexOrRealType, InputType> {
 
-	typedef Matrix<ComplexOrRealType> MatrixType;
+	using MatrixType = Matrix<ComplexOrRealType>;
+	using RealType = typename Real<ComplexOrRealType>::Type;
 
 public:
 
 	LongRange()
 	    : linSize_(0)
-	    , orbitals_(0)
+	    , dofs_(0)
 	    , maxConnections_(0)
 	{
 	}
 
-	LongRange(SizeType linSize, InputType& io)
+	LongRange(SizeType linSize, std::string goptions, InputType& io)
 	    : linSize_(linSize)
 	    , maxConnections_(0)
 	{
@@ -107,26 +106,40 @@ public:
 		try {
 			io.readline(entangler, "GeometryEntangler=");
 			hasEntangler = true;
-		} catch (std::exception&) {
+		}
+		catch (std::exception&) {
 		}
 
+		io.readline(dofs_, "DegreesOfFreedom=");
+
 		if (hasEntangler) {
-			SizeType orbitals = 0;
-			io.readline(orbitals, "Orbitals=");
-			const SizeType n = orbitals * linSize;
+			const SizeType n = dofs_ * linSize;
 			matrix_.resize(n, n);
 			setEntangler(entangler);
-		} else {
+		}
+		else {
 			io.read(matrix_, "Connectors");
+		}
+
+		if (goptions != "ConstantValues" and goptions != "compact" and goptions != "none") {
+			throw RuntimeError(std::string("GeometryOptions must be either ") + "ConstantValues or compact or none, not " + goptions + "\n");
+		}
+
+		if (goptions == "compact") {
+			reinterpretMatrix();
+		}
+		else {
+			if (dofs_ != matrix_.rows() / linSize) {
+				throw RuntimeError("Wrong Connectors matrix size\n");
+			}
 		}
 
 		checkConnectors(matrix_, linSize_);
 
-		orbitals_ = matrix_.rows() / linSize;
-
 		try {
 			io.readline(maxConnections_, "GeometryMaxConnections=");
-		} catch (std::exception& e) {
+		}
+		catch (std::exception& e) {
 			if (!hasEntangler) {
 				std::cerr
 				    << "Please add GeometryMaxConnections=0 or "
@@ -139,7 +152,7 @@ public:
 	virtual void set(MatrixType& m, SizeType orbitals) const
 	{
 		m = matrix_;
-		if (orbitals != orbitals_)
+		if (orbitals != dofs_)
 			throw RuntimeError(
 			    "General geometry connectors: wrong size\n");
 	}
@@ -147,7 +160,7 @@ public:
 	virtual SizeType maxConnections() const
 	{
 		return (maxConnections_ == 0) ? linSize_ * linSize_ * 0.25
-					      : maxConnections_;
+		                              : maxConnections_;
 	}
 
 	virtual SizeType dirs() const { return 1; }
@@ -241,7 +254,7 @@ private:
 
 		if (str.empty())
 			return;
-		throw RuntimeError(str);
+		std::cerr<<"WARNING: "<<str;
 	}
 
 	static bool hasDiagonal(const MatrixType& matrix)
@@ -269,8 +282,69 @@ private:
 		return false;
 	}
 
+	// If orbitals == 1 then order is
+	// site0 site1 value
+	//
+	// If orbitals > 1 then order is
+	// site0 orb0 site1 orb1 value
+	void reinterpretMatrix()
+	{
+		MatrixType values = matrix_;
+		assert(linSize_ > 0);
+		assert(dofs_ > 0);
+		SizeType n = linSize_ * dofs_;
+		matrix_.clear();
+		matrix_.resize(n, n);
+		if (dofs_ > 1) {
+			assert(values.cols() == 5);
+			for (SizeType i = 0; i < values.rows(); ++i) {
+				SizeType counter = 0;
+				SizeType site0 = complexToInteger(values(i, counter++));
+				SizeType orb0 = complexToInteger(values(i, counter++));
+				SizeType site1 = complexToInteger(values(i, counter++));
+				SizeType orb1 = complexToInteger(values(i, counter++));
+				matrix_(orb0 + site0 * dofs_, orb1 + site1 * dofs_) = values(i, counter++);
+			}
+		}
+		else {
+			assert(values.cols() == 3);
+			for (SizeType i = 0; i < values.rows(); ++i) {
+				SizeType counter = 0;
+				SizeType site0 = complexToInteger(values(i, counter++));
+				SizeType site1 = complexToInteger(values(i, counter++));
+				matrix_(site0, site1) = values(i, counter++);
+			}
+		}
+	}
+
+	static SizeType complexToInteger(const ComplexOrRealType& value)
+	{
+		if (std::imag(value) != 0) {
+			throw RuntimeError(std::string("Expected an integer in Connectors matrix ") + +" with compact option, not a complex number\n");
+		}
+
+		RealType val = std::real(value);
+		if (!isInt64(val)) {
+			throw RuntimeError(std::string("Expected an integer in Connectors matrix ") + +" with compact option, not a floating point number\n");
+		}
+
+		SizeType valInt = static_cast<SizeType>(val);
+		return valInt;
+	}
+
+	// Credit for the idea: https://sillycross.github.io/index.html
+	static bool isInt64(double d)
+	{
+		if (-9223372036854775808.0 <= d && d < 9223372036854775808.0) {
+			return d == static_cast<double>(static_cast<int64_t>(d));
+		}
+		else {
+			return false;
+		}
+	}
+
 	SizeType linSize_;
-	SizeType orbitals_;
+	SizeType dofs_;
 	SizeType maxConnections_;
 	MatrixType matrix_;
 }; // class LongRange
